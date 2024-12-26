@@ -19,6 +19,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  otp: {
+    type: String,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
   bookings: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Booking',  // Reference to Booking model

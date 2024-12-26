@@ -5,12 +5,15 @@ const {
   loginUser, 
   getUserData, 
   updateUserDetails, 
-  deleteUserAccount 
+  deleteUserAccount ,
+  verifyOtp
 } = require('../controllers/authController');
 const authenticateJWT = require('../middleware/authenticateJWT');  // Import authentication middleware
 
 // Register a new user
 router.post('/register', registerUser);
+
+router.post('/verify-otp',verifyOtp)
 
 // Login user
 router.post('/login', loginUser);

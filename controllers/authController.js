@@ -15,7 +15,7 @@ const registerUser = async (req, res) => {
     }
 
     // Check if email or username already exists
-    const existingUser = await User.findOne({ $or: [{ email }] });
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists with this email or username' });
     }
@@ -23,8 +23,8 @@ const registerUser = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log(hashedPassword);
-    
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Create a new user
     const newUser = new User({
@@ -32,23 +32,47 @@ const registerUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      bookings: [], 
+      bookings: [],
+      otp, // Store OTP temporarily in the database (or you can create a separate OTP collection)
+      otpExpiration: Date.now() + 15 * 60 * 1000, // Set OTP expiration to 15 minutes (example)
     });
 
     // Save the new user to the database
     await newUser.save();
 
-    // Generate a JWT token for the user
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log(token);
-    console.log(process.env.JWT_SECRET);
-    
+    // Send OTP via email
+    const emailContent = `Hi ${name},\n\nThank you for registering! Please use the following OTP to verify your email:\n\n${otp}\n\nThe OTP will expire in 15 minutes.\n\nBest regards,\nYour Team`;
 
-    // Respond with a success message and token
-    res.status(201).json({ message: 'User registered successfully', token });
+    await sendEmail(email, 'Verify Your Email', emailContent);
+
+    // Respond with a success message and instruct user to verify OTP
+    res.status(201).json({ 
+      message: 'User registered successfully. Please verify the OTP sent to your email.' 
+    });
   } catch (error) {
     console.error("Registration Error:", error);
     res.status(500).json({ message: 'Server error, please try again later' });
+  }
+};
+
+
+const verifyOtp = async (req, res) => {
+  const { otp } = req.body;
+
+  try {
+      const user = await User.findOne({ otp });
+
+      if (!user || user.otp !== otp) {
+          return res.status(400).json({ message: "Invalid OTP!" });
+      }
+
+      user.isVerified = true;
+      user.otp = null;
+      await user.save();
+
+      res.status(200).json({ message: "Account verified successfully!" });
+  } catch (error) {
+      res.status(500).json({ message: error.message });
   }
 };
 
@@ -139,10 +163,13 @@ const deleteUserAccount = async (req, res) => {
   }
 };
 
+
+
 module.exports = { 
   registerUser, 
   loginUser, 
   getUserData, 
   updateUserDetails, 
-  deleteUserAccount 
+  deleteUserAccount ,
+  verifyOtp
 };
