@@ -1,16 +1,17 @@
 const User = require('../models/User'); // Import User model
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const {sendEmail} = require('../config/sendMail')
 
 const registerUser = async (req, res) => {
-  const { name, username, email, password } = req.body;
+  const { name, username, email, password, ConfirmPassword} = req.body;
 
   // Log incoming data to ensure it's correct
   console.log("Incoming registration data:", req.body);
 
   try {
     // Check if all fields are present
-    if (!name || !username || !email || !password) {
+    if (!name || !username || !email || !password || ! ConfirmPassword) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -32,6 +33,7 @@ const registerUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      ConfirmPassword: hashedPassword,
       bookings: [],
       otp, // Store OTP temporarily in the database (or you can create a separate OTP collection)
       otpExpiration: Date.now() + 15 * 60 * 1000, // Set OTP expiration to 15 minutes (example)
