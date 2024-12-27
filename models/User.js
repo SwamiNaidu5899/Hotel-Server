@@ -34,8 +34,22 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Booking',  // Reference to Booking model
   }],
+
+  resetPasswordToken: {
+
+    type: String,
+
+  },
+
+  resetPasswordExpire: {
+
+    type: Date,
+
+  },
+
 });
 
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
+
