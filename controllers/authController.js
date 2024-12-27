@@ -102,11 +102,42 @@ const forgetPassword = async (req, res) => {
     console.log(process.env.client_url);
     console.log(resetToken);
  
-    const emailContent = `Hi ${user.username},<br><br>
-    Thank you for requesting a password reset. please follow the link below to reset your password.<br><br>
-    Please <a href="${resetUrl}">Clickhere</a> to reset your password.<br><br>
-    Best regards,<br>
-    GiveHope`;
+    const emailContent = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f4f4f9; border-radius: 8px; max-width: 600px; margin: auto;">
+      <h2 style="color: #3949ab; text-align: center;">Password Reset Request</h2>
+  
+      <p style="font-size: 16px;">
+        Hi <strong style="color: #3949ab;">${user.username}</strong>,
+      </p>
+  
+      <p style="font-size: 16px;">
+        Thank you for requesting a password reset. Please follow the link below to reset your password.
+      </p>
+  
+      <p style="font-size: 16px; text-align: center; margin-top: 20px;">
+        <a href="${resetUrl}" style="text-decoration: none; background-color: #3949ab; color: white; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; transition: background-color 0.3s;">
+          Click here to reset your password
+        </a>
+      </p>
+  
+      <p style="font-size: 16px;">
+        If you did not request a password reset, please ignore this email or contact support immediately.
+      </p>
+  
+      <div style="text-align: center; margin-top: 30px;">
+        <p style="font-size: 16px; color: #555;">
+          Best regards,<br>
+          <strong style="color: #3949ab;">GiveHope Team</strong>
+        </p>
+      </div>
+  
+      <footer style="font-size: 12px; color: #777; text-align: center; margin-top: 50px;">
+        <p>&copy; ${new Date().getFullYear()} GiveHope. All rights reserved.</p>
+        <p>If you have any questions, feel free to reach out to our support team.</p>
+      </footer>
+    </div>
+  `;
+  
  
     await sendEmail(email, "Password Reset Request", emailContent, true);
  
@@ -159,11 +190,36 @@ const resetPassword = async (req, res) => {
     await user.save();
  
     // Send email confirmation
-    const emailContent = `Hi ${user.username},<br><br>
-    Your password has been successfully reset. You can now log in with your new password.<br><br>
-    If you did not request a password reset, please contact support immediately.<br><br>
-    Best regards,<br>
-    GiveHope`;
+    const emailContent = `
+  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f4f4f9; border-radius: 8px; max-width: 600px; margin: auto;">
+    <h2 style="color: #3949ab; text-align: center;">Password Reset Successful</h2>
+    
+    <p style="font-size: 16px;">
+      Hi <strong style="color: #3949ab;">${user.username}</strong>,
+    </p>
+
+    <p style="font-size: 16px;">
+      Your password has been successfully reset. You can now log in with your new password.
+    </p>
+
+    <p style="font-size: 16px;">
+      If you did not request this change, please contact our support team immediately.
+    </p>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <p style="font-size: 16px; color: #555;">
+        Best regards,<br>
+        <strong style="color: #3949ab;">GiveHope Team</strong>
+      </p>
+    </div>
+
+    <footer style="font-size: 12px; color: #777; text-align: center; margin-top: 50px;">
+      <p>&copy; ${new Date().getFullYear()} GiveHope. All rights reserved.</p>
+      <p>If you have any questions, feel free to reach out to our support team.</p>
+    </footer>
+  </div>
+`;
+
  
     await sendEmail(
       user.email,
