@@ -14,12 +14,12 @@ const transporter = nodemailer.createTransport({
 });
 
 // Function to send an email
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, htmlContent) => {
     const mailOptions = {
         from: process.env.Email_Main,  // Sender's email address
         to: to,                        // Recipient's email address
         subject: subject,              // Email subject
-        text: text,                    // Email body text
+        html: htmlContent,             // Email body in HTML format
     };
 
     try {
